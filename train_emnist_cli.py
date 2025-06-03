@@ -18,7 +18,7 @@ import argparse
 import sys
 import numpy as np
 from PIL import Image
-import tensorflow as tf
+from ai_edge_litert.interpreter import Interpreter
 
 
 def load_and_preprocess(path):
@@ -31,34 +31,41 @@ def load_and_preprocess(path):
 
 
 def main():
+    
+    # p = argparse.ArgumentParser(
+    #     description="Run one TFLite training step on a single 28x28 PNG + label."
+    # )
+    # p.add_argument(
+    #     "--model", required=True,
+    #     help="Path to existing trainable .tflite (e.g. emnist_litert_train.tflite)."
+    # )
+    # p.add_argument(
+    #     "--image", required=True,
+    #     help="Path to a 28x28 grayscale PNG to train on."
+    # )
+    # p.add_argument(
+    #     "--label", type=int, required=True,
+    #     help="Integer label (0-25) for that image."
+    # )
+    # p.add_argument(
+    #     "--out", required=True,
+    #     help="Where to write the updated .tflite (can be same as --model to overwrite)."
+    # )
     p = argparse.ArgumentParser(
-        description="Run one TFLite training step on a single 28x28 PNG + label."
-    )
-    p.add_argument(
-        "--model", required=True,
-        help="Path to existing trainable .tflite (e.g. emnist_litert_train.tflite)."
-    )
-    p.add_argument(
-        "--image", required=True,
-        help="Path to a 28x28 grayscale PNG to train on."
-    )
-    p.add_argument(
-        "--label", type=int, required=True,
-        help="Integer label (0-25) for that image."
-    )
-    p.add_argument(
-        "--out", required=True,
-        help="Where to write the updated .tflite (can be same as --model to overwrite)."
-    )
+        description="Run one TFLite training step on a single 28x28 PNG + label.")
+
     args = p.parse_args()
+    args.model = "./c/models/emnist_train.tflite"
+    args.image = "./images/letters/B_13.png"
+    args.label = 1
+    args.out = "./c/models/emnist_train.tflite"
 
     # 1) Load the trainable TFLite into a Python Interpreter
-    interpreter = tf.lite.Interpreter(
-        model_path=args.model,
-        experimental_enable_resource_variables=True,
-        experimental_preserve_all_tensors=True
+    interpreter = Interpreter(
+    model_path=args.model,
+    num_threads=4,
     )
-    interpreter.allocate_tensors()
+    interpreter.reset_variable_tensors()
 
     # 2) Grab the 'train' signature runner
     try:
