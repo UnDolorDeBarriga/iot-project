@@ -65,7 +65,8 @@ def main():
     model_path=args.model,
     num_threads=4,
     )
-    interpreter.reset_variable_tensors()
+
+    interpreter.allocate_tensors()
 
     # 2) Grab the 'train' signature runner
     try:
