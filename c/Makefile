@@ -1,11 +1,26 @@
+# Makefile for infer_emnist
 CC      := gcc
-CFLAGS  := -O3 -std=c11 -I/usr/local/include -I.
-LDFLAGS := -L/usr/local/lib -ltensorflowlite_c -lm -ldl -pthread
+CFLAGS  := -O3 -Wall -Wextra -std=c11
+INCLUDE := /usr/local/include
+LIBDIR  := /usr/local/lib
 
-all: infer_emnist
+TARGET := infer_emnist
+SRCS   := main.c
+OBJS   := $(SRCS:.c=.o)
 
-infer_emnist: main.c emnist_train_model.h stb_image.h
-	$(CC) $(CFLAGS) main.c -o $@ $(LDFLAGS)
+LDLIBS := -L$(LIBDIR) -ltensorflowlite_c -lpthread -lm -ldl
+
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	@echo "Linking $@"
+	$(CC) $(CFLAGS) -I$(INCLUDE) $^ $(LDLIBS) -o $@
+
+%.o: %.c
+	@echo "Compiling $<"
+	$(CC) $(CFLAGS) -I$(INCLUDE) -c $< -o $@
 
 clean:
-	rm -f infer_emnist
+	rm -f $(OBJS) $(TARGET)
+
+.PHONY: all clean
