@@ -1,2 +1,3 @@
 saved_ds/**
 .venv/**
+models/lit_saved_model/**
